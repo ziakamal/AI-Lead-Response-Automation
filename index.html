@@ -1,1 +1,719 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lead Response Demo - Never Lose Another Lead</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background: #0a0e1a; 
+            color: #f1f5f9; 
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34,197,94,0.2);
+            border: 1px solid rgba(34,197,94,0.4);
+            color: #4ade80;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .pulse-dot {
+            width: 8px; height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .hero p {
+            font-size: 16px;
+            color: #94a3b8;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        
+        /* CARDS */
+        .card {
+            background: #0f172a;
+            border: 1px solid #1e3a5f;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .card-title {
+            color: #f8fafc;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-num {
+            background: #38bdf8;
+            color: #0f172a;
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        .form-group label {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: #f1f5f9;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #38bdf8;
+        }
+        .form-group textarea { resize: vertical; }
+        
+        /* BUTTON */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(56,189,248,0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            color: white !important;
+        }
+        
+        /* TIMELINE */
+        .timeline { position: relative; padding-left: 32px; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #38bdf8, #22c55e, #a855f7);
+        }
+        .timeline-step {
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s;
+        }
+        .timeline-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            border: 4px solid #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .timeline-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .time-badge {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .timeline-body {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 12px;
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* SMS BUBBLE */
+        .sms-bubble {
+            background: #14532d;
+            border: 1px solid #22c55e;
+            border-radius: 16px 16px 16px 4px;
+            padding: 14px;
+            color: #dcfce7;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+        
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+        .stat-card {
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .stat-card.bad {
+            background: #450a0a;
+            border: 1px solid #7f1d1d;
+        }
+        .stat-card.good {
+            background: #052e16;
+            border: 1px solid #15803d;
+        }
+        .stat-label {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .stat-card.bad .stat-label { color: #fca5a5; }
+        .stat-card.good .stat-label { color: #86efac; }
+        .stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .stat-card.bad .stat-value { color: #f87171; }
+        .stat-card.good .stat-value { color: #4ade80; }
+        .stat-desc {
+            font-size: 14px;
+        }
+        .stat-card.bad .stat-desc { color: #fca5a5; }
+        .stat-card.good .stat-desc { color: #86efac; }
+        .stat-divider {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid;
+        }
+        .stat-card.bad .stat-divider { border-color: #7f1d1d; }
+        .stat-card.good .stat-divider { border-color: #15803d; }
+        .stat-sub {
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .stat-card.bad .stat-sub { color: #f87171; }
+        .stat-card.good .stat-sub { color: #4ade80; }
+        
+        /* ROI CALC */
+        .roi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .roi-grid { grid-template-columns: 1fr; }
+        }
+        .roi-result {
+            background: linear-gradient(135deg, #052e16, #0f172a);
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .roi-result-label {
+            color: #86efac;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .roi-result-value {
+            color: #4ade80;
+            font-size: 48px;
+            font-weight: 800;
+        }
+        .roi-result-note {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, #1e3a5f, #0f172a);
+            border: 2px solid #38bdf8;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+        }
+        .cta-section h2 {
+            color: #f8fafc;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .cta-section p {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        .btn-cta {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 18px 48px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(34,197,94,0.3);
+            text-decoration: none;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(34,197,94,0.4);
+        }
+        .trust-badges {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .trust-badge {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.3);
+            border-radius: 10px;
+            padding: 12px 20px;
+            color: #4ade80;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .cta-note {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+        
+        /* FOOTER TRUST */
+        .footer-trust {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .trust-item {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .trust-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .trust-item strong {
+            color: #94a3b8;
+        }
+        
+        /* HIDDEN */
+        .hidden { display: none; }
+        
+        /* SPINNER */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="badge">
+                    <span class="pulse-dot"></span>
+                    LIVE DEMO — Try It Yourself
+                </div>
+                <h1>Never Lose Another Lead<br>to Slow Response Times</h1>
+                <p>See how AI responds to your leads in <strong style="color: #38bdf8;">under 60 seconds</strong> — 24/7, while you sleep.</p>
+            </div>
+        </div>
+        
+        <!-- STEP 1: INPUT -->
+        <div class="card">
+            <div class="card-title">
+                <span class="step-num">1</span>
+                Simulate a Lead Coming In
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Lead Name</label>
+                    <input type="text" id="leadName" value="Sarah Johnson">
+                </div>
+                <div class="form-group">
+                    <label>Service Needed</label>
+                    <select id="serviceType">
+                        <option value="roofing">Emergency Roof Repair</option>
+                        <option value="hvac">HVAC Installation</option>
+                        <option value="plumbing">Plumbing Emergency</option>
+                        <option value="legal">Legal Consultation</option>
+                        <option value="realestate">Home Buying</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Lead Message</label>
+                <textarea id="leadMessage" rows="3">Hi, my roof is leaking badly after last night's storm. I need someone to come out ASAP. Can you help?</textarea>
+            </div>
+            <button class="btn-primary" id="demoBtn" onclick="runDemo()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Run AI Response Demo
+            </button>
+        </div>
+        
+        <!-- SIMULATION AREA -->
+        <div id="simulationArea" class="hidden">
+            
+            <!-- TIMELINE -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-num">2</span>
+                    Watch What Happens
+                </div>
+                <div class="timeline">
+                    <div class="timeline-step" id="step1">
+                        <div class="timeline-dot" style="background: #38bdf8;">
+                            <span style="width: 8px; height: 8px; background: white; border-radius: 50%; display: block;"></span>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="time-badge" style="background: #38bdf8; color: #0f172a;">11:42:00 PM</span>
+                                <span style="color: #94a3b8; font-size: 13px;">Lead submitted via website form</span>
+                            </div>
+                            <div class="timeline-body">
+                                <strong style="color: #38bdf8;">New Lead:</strong> <span id="displayName">Sarah Johnson</span><br>
+                                <strong style="color: #38bdf8;">Service:</strong> <span id="displayService">Emergency Roof Repair</span><br>
+                                <strong style="color: #38bdf8;">Message:</strong> <span id="displayMessage">Hi, my roof is leaking badly after last night's storm. I need someone to come out ASAP. Can you help?</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step2">
+                        <div class="timeline-dot" style="background: #f59e0b;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="time-badge" style="background: #f59e0b; color: #0f172a;">11:42:01 PM</span>
+                                <span style="color: #94a3b8; font-size: 13px;">AI analyzes lead + generates response</span>
+                            </div>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+                                <div style="background: #0f172a; border-radius: 8px; padding: 10px 14px; text-align: center; min-width: 100px;">
+                                    <div style="color: #f59e0b; font-size: 20px; font-weight: 800;">HOT</div>
+                                    <div style="color: #64748b; font-size: 11px;">Lead Score</div>
+                                </div>
+                                <div style="background: #0f172a; border-radius: 8px; padding: 10px 14px; text-align: center; min-width: 100px;">
+                                    <div style="color: #22c55e; font-size: 20px; font-weight: 800;">45s</div>
+                                    <div style="color: #64748b; font-size: 11px;">Response Time</div>
+                                </div>
+                                <div style="background: #0f172a; border-radius: 8px; padding: 10px 14px; text-align: center; min-width: 100px;">
+                                    <div style="color: #a855f7; font-size: 20px; font-weight: 800;">98%</div>
+                                    <div style="color: #64748b; font-size: 11px;">Match Quality</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step3">
+                        <div class="timeline-dot" style="background: #22c55e;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M22 2L11 13M22 2l-7 20-5-5-5 5 2-20 20 7z"></path></svg>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="time-badge" style="background: #22c55e; color: #0f172a;">11:42:03 PM</span>
+                                <span style="color: #94a3b8; font-size: 13px;">AI sends personalized SMS to lead</span>
+                            </div>
+                            <div class="sms-bubble" style="margin-top: 10px;">
+                                <div style="font-weight: 700; margin-bottom: 6px; color: #4ade80;">📱 AI SMS Sent to Lead:</div>
+                                <div id="aiResponse" style="font-style: italic;">"Hi Sarah! This is [Company Name]. I saw your message about the roof leak — that sounds urgent. I'm connecting you with our emergency team right now. Can you confirm your address? Meanwhile, book a same-day inspection here: [Calendly Link] — we'll be there within 2 hours. -Mike"</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step4">
+                        <div class="timeline-dot" style="background: #a855f7;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="time-badge" style="background: #a855f7; color: white;">11:42:04 PM</span>
+                                <span style="color: #94a3b8; font-size: 13px;">Business owner gets instant alert</span>
+                            </div>
+                            <div class="timeline-body" style="border-left: 3px solid #a855f7; margin-top: 10px;">
+                                <strong style="color: #a855f7;">🔔 Slack Alert to Owner:</strong><br>
+                                "🚨 HOT LEAD: Sarah Johnson — Emergency Roof Repair<br>
+                                AI responded in 3 seconds. Lead qualified: HIGH INTENT.<br>
+                                Lead booked appointment: <span style="color: #22c55e;">YES</span> | Follow-up needed: <span style="color: #ef4444;">NO</span>"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BEFORE / AFTER -->
+            <div class="stats-grid">
+                <div class="stat-card bad">
+                    <div class="stat-label">❌ WITHOUT AI</div>
+                    <div class="stat-value">8+ hrs</div>
+                    <div class="stat-desc">Average response time</div>
+                    <div class="stat-divider">
+                        <div class="stat-sub">60–70%</div>
+                        <div class="stat-desc">Leads lost to competitors</div>
+                    </div>
+                </div>
+                <div class="stat-card good">
+                    <div class="stat-label">✅ WITH AI</div>
+                    <div class="stat-value">&lt; 60s</div>
+                    <div class="stat-desc">Average response time</div>
+                    <div class="stat-divider">
+                        <div class="stat-sub">&lt; 10%</div>
+                        <div class="stat-desc">Leads lost to competitors</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ROI CALCULATOR -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-num">3</span>
+                    Calculate Your Recovery
+                </div>
+                <div class="roi-grid">
+                    <div class="form-group">
+                        <label>Leads per month</label>
+                        <input type="number" id="leadsPerMonth" value="40" oninput="calculateROI()">
+                    </div>
+                    <div class="form-group">
+                        <label>Avg. deal value ($)</label>
+                        <input type="number" id="dealValue" value="8500" oninput="calculateROI()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current close rate (%)</label>
+                        <input type="number" id="closeRate" value="20" oninput="calculateROI()">
+                    </div>
+                </div>
+                <div class="roi-result">
+                    <div class="roi-result-label">💰 Estimated Monthly Revenue Recovery</div>
+                    <div class="roi-result-value" id="roiResult">$27,200</div>
+                    <div class="roi-result-note">Recovering just <strong style="color: #f8fafc;">30% more leads</strong> with instant AI response</div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Ready to Stop Losing Leads?</h2>
+            <p>I build and deploy this exact system for <strong style="color: #38bdf8;">$497–$997</strong> — live in 48 hours. No long-term contract. No tech skills required from you.</p>
+            <div class="trust-badges">
+                <div class="trust-badge">✅ Live in 48 Hours</div>
+                <div class="trust-badge">✅ No Code Required</div>
+                <div class="trust-badge">✅ 30-Day Guarantee</div>
+            </div>
+            <a href="https://calendly.com/YOUR-CALENDLY-LINK" target="_blank" class="btn-cta">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Book Your Free 15-Min Audit
+            </a>
+            <p class="cta-note">⏱️ Only 3 spots available this week • No obligation • I'll show you exactly how many leads you're losing</p>
+        </div>
+        
+        <!-- FOOTER TRUST -->
+        <div class="footer-trust">
+            <div class="trust-item">
+                <div class="icon">⚡</div>
+                <strong>&lt;60s</strong><br>Response Time
+            </div>
+            <div class="trust-item">
+                <div class="icon">🤖</div>
+                <strong>24/7</strong><br>Always On
+            </div>
+            <div class="trust-item">
+                <div class="icon">💬</div>
+                <strong>AI-Powered</strong><br>Personalized
+            </div>
+            <div class="trust-item">
+                <div class="icon">📊</div>
+                <strong>Real-Time</strong><br>Analytics
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        const responses = {
+            roofing: "Hi Sarah! This is [Company Name]. I saw your message about the roof leak — that sounds urgent and I want to get someone out to you fast. I'm connecting you with our emergency team right now. Can you confirm your address? Meanwhile, book a same-day inspection here: [Calendly Link] — we'll be there within 2 hours. -Mike",
+            hvac: "Hi Sarah! Thanks for reaching out about the HVAC installation. This is [Company Name]. Based on your message, it sounds like you need this sorted quickly. I can have our tech specialist call you within 10 minutes. In the meantime, book your free in-home assessment here: [Calendly Link] — we have slots tomorrow morning. -Mike",
+            plumbing: "Hi Sarah! This is [Company Name] — I got your message about the plumbing emergency. That sounds stressful. Our emergency plumber is on standby and I can dispatch someone within the hour. Please confirm your address and I'll send them your way. You can also book directly here: [Calendly Link]. -Mike",
+            legal: "Hi Sarah, thank you for contacting [Firm Name]. I understand you need a legal consultation, and I want to make sure you get the right attorney for your situation. I've flagged your inquiry as high priority. Please book a free 30-minute case evaluation here: [Calendly Link] — we have availability tomorrow at 10 AM and 2 PM. -Mike",
+            realestate: "Hi Sarah! Exciting that you're looking for a home! This is [Agent Name] with [Agency]. I'd love to help you find the perfect place. Based on your message, I have a few listings that might be exactly what you're looking for. Let's chat — book a quick call here: [Calendly Link] and I'll send you a personalized list beforehand. -Mike"
+        };
+        
+        function runDemo() {
+            const btn = document.getElementById('demoBtn');
+            btn.innerHTML = '<svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"></circle></svg> Running AI Simulation...';
+            btn.disabled = true;
+            
+            const name = document.getElementById('leadName').value;
+            const service = document.getElementById('serviceType').value;
+            const message = document.getElementById('leadMessage').value;
+            const serviceLabels = {roofing: 'Emergency Roof Repair', hvac: 'HVAC Installation', plumbing: 'Plumbing Emergency', legal: 'Legal Consultation', realestate: 'Home Buying'};
+            
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayService').textContent = serviceLabels[service];
+            document.getElementById('displayMessage').textContent = message;
+            document.getElementById('aiResponse').textContent = responses[service].replace(/Sarah/g, name.split(' ')[0]);
+            
+            document.getElementById('simulationArea').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('step1').classList.add('visible');
+            }, 300);
+            
+            setTimeout(() => {
+                document.getElementById('step2').classList.add('visible');
+            }, 1200);
+            
+            setTimeout(() => {
+                document.getElementById('step3').classList.add('visible');
+            }, 2200);
+            
+            setTimeout(() => {
+                document.getElementById('step4').classList.add('visible');
+                btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Demo Complete — See Results Below';
+                btn.classList.add('btn-success');
+                btn.disabled = false;
+            }, 3200);
+            
+            setTimeout(() => {
+                document.getElementById('simulationArea').scrollIntoView({behavior: 'smooth', block: 'start'});
+            }, 3500);
+        }
+        
+        function calculateROI() {
+            const leads = parseInt(document.getElementById('leadsPerMonth').value) || 0;
+            const value = parseInt(document.getElementById('dealValue').value) || 0;
+            const rate = parseInt(document.getElementById('closeRate').value) || 0;
+            
+            const currentRevenue = leads * (rate / 100) * value;
+            const improvedRate = Math.min(rate * 1.5, 100);
+            const improvedRevenue = leads * (improvedRate / 100) * value;
+            const recovery = improvedRevenue - currentRevenue;
+            
+            document.getElementById('roiResult').textContent = '$' + recovery.toLocaleString();
+        }
+        
+        calculateROI();
+    </script>
+</body>
+</html>
